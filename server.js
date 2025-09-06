@@ -19,7 +19,8 @@ app.use(cors({
     origin: [
         "http://localhost:5173",
         "http://localhost:5174",   // React local
-        "https://your-frontend-domain.com" // (later when you deploy React)
+        "https://prescripto-xi-https://prescripto-git-main-ahmedqazimubeen-2330s-projects.vercel.app/.vercel.app/",
+         // (later when you deploy React)
     ],
     credentials: true
 }))
