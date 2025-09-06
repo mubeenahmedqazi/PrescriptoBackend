@@ -20,6 +20,7 @@ app.use(cors({
         "http://localhost:5173",
         "http://localhost:5174",   // React local
         "https://prescripto-xi-eosin.vercel.app",
+        "https://prescripto-vr29.vercel.app/"
          // (later when you deploy React)
     ],
     credentials: true
