@@ -4,28 +4,35 @@ import 'dotenv/config'
 import connectDB from './config/mongodb.js'
 import connectCloudinary from './config/cloudinary.js'
 import adminRouter from './routes/adminRoute.js'
-import morgan from'morgan'
+import morgan from 'morgan'
 import doctorRouter from './routes/doctorRoute.js'
 import userRouter from './routes/userRoute.js'
-// app config
 
-const app=express()
-const port=process.env.PORT || 4000
+const app = express()
+const port = process.env.PORT || 4000
+
 connectDB()
 connectCloudinary()
 
-//middlewares
+// ✅ Allow your frontend origin
+app.use(cors({
+    origin: [
+        "http://localhost:5173",   // React local
+        "https://your-frontend-domain.com" // (later when you deploy React)
+    ],
+    credentials: true
+}))
+
 app.use(express.json())
-app.use(cors())
-app.use(morgan(":method :url :status :res[content-length] - :response-time ms"));
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms"))
 
-//api endpoints
-app.use('/api/admin',adminRouter)
-app.use('/api/doctor',doctorRouter)
-app.use('/api/user',userRouter)
-//localhost port4000/api/admin
+// api endpoints
+app.use('/api/admin', adminRouter)
+app.use('/api/doctor', doctorRouter)
+app.use('/api/user', userRouter)
 
-app.get('/',(req,res)=>{
+app.get('/', (req, res) => {
     res.send('API WORKING')
 })
-app.listen(port,()=>console.log("Server started",port))
+
+app.listen(port, () => console.log("Server started", port))
