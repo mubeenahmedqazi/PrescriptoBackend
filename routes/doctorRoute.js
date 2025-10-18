@@ -11,7 +11,7 @@ doctorRouter.get('/list', doctorList)
 doctorRouter.post('/login', loginDoctor)
 
 // Route for doctor appointments (protected)
-doctorRouter.get('/appointments',  appointmentsDoctor)
+doctorRouter.get('/appointments', authDoctor, appointmentsDoctor)
 doctorRouter.post('/complete-appointment', authDoctor, appointmentComplete)
 doctorRouter.post('/cancel-appointment', authDoctor, appointmentCancel)
 doctorRouter.get('/dashboard', authDoctor, doctorDashboard)
