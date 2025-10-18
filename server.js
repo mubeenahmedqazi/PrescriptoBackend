@@ -42,7 +42,7 @@ app.use('/api/user', userRouter)
 
 // Root test
 app.get('/', (req, res) => {
-    res.send('API WORKING')
+    res.send('API WORKING Locally')
 })
 
 // Start server
