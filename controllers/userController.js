@@ -108,62 +108,47 @@ const updateProfile = async (req, res) => {
 }
 
 //api to book appointment
-const bookAppointment=async(req,res)=>{
-    try {
-        const{docId,slotDate,slotTime}=req.body
-        const userId = req.user.id; 
-        const docData=await doctorModel.findById(docId).select('-password')
-        if(!docData.available){
-            return res.json({success:false,message:"Doctor is not available"})
-        }
-        let slots_booked=docData.slots_booked
-        //checking for slots availibility
-        if(slots_booked[slotDate]){
-            if(slots_booked[slotDate].includes(slotTime)){
-                return res.json({success:false,message:"Slots not available"})
-            } else {
-                slots_booked[slotDate].push(slotTime)
-            }
-        } else{
-            slots_booked[slotDate]=[]
-            slots_booked[slotDate].push(slotTime)
-        }
-        const userData=await userModel.findById(userId).select('-password')
-        delete docData.slots_booked
-        const appointmentData={
-            userId,
-            docId,
-            userData,
-            docData,
-            amount:docData.fees,
-            slotTime,
-            slotDate,
-            date:Date.now()
-
-
-        }
-        const newAppointment=new appointmentModel(appointmentData)
-        await newAppointment.save()
-        //save new slots data in docdata
-        await doctorModel.findByIdAndUpdate(docId,{slots_booked})
-        res.json({success:true,message:"Appointment Booked"})
-    } catch (error) {
-        console.log(error)
-        res.json({success:false,message:error.message})
+const bookAppointment = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized"
+      })
     }
-}
-//api to get user appointments my-appointments page
 
-const listAppointment =async(req,res)=>{
-    try {
-        const userId=req.user.id
-        const appointments=await appointmentModel.find({userId})
-        res.json({success:true,appointments})
-    } catch (error) {
-        console.log(error)
-        res.json({success:false,message:error.message})
+    const userData = req.user
+    const { docId, slotDate, slotTime } = req.body
+
+    if (!docId || !slotDate || !slotTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing appointment data"
+      })
     }
+
+    const appointment = new appointmentModel({
+      userId: userData._id,
+      userData,
+      docId,
+      slotDate,
+      slotTime
+    })
+
+    await appointment.save()
+
+    res.json({
+      success: true,
+      message: "Appointment booked successfully"
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
 }
+
 //api to cancel appointment
 const cancelAppointment = async (req, res) => {
   try {

@@ -1,25 +1,37 @@
-import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken"
+import User from "../models/userModel.js"
 
 const authUser = async (req, res, next) => {
   try {
-    // ✅ Look in Authorization header first, fallback to token
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : req.headers.token;
+    const authHeader = req.headers.authorization
 
-    if (!token) {
-      return res.status(401).json({ success: false, message: "Not Authorized, Login Again" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Not Authorized"
+      })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: decoded.id };
+    const token = authHeader.split(" ")[1]
 
-    next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+    req.user = await User.findById(decoded.id).select("-password")
+
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found"
+      })
+    }
+
+    next()
   } catch (error) {
-    console.log(error);
-    return res.status(401).json({ success: false, message: "Not Authorized, Login Again" });
+    return res.status(401).json({
+      success: false,
+      message: "Invalid token"
+    })
   }
-};
+}
 
-export default authUser;
+export default authUser
